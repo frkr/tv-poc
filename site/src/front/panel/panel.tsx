@@ -1,13 +1,13 @@
 import React from "react";
-import { useLoaderData } from "react-router";
+import { useLoaderData, Outlet, Link, useLocation } from "react-router";
 
 function formatDate(timestamp: string | number) {
     return new Date(timestamp).toLocaleString();
 }
 
 export default function Panel() {
-    // A interface do que o loader retorna deve ser inferida ou tipada aqui
     const data = useLoaderData() as { isAdmin: boolean, user: any, version: any };
+    const location = useLocation();
 
     const { isAdmin, user, version } = data;
 
@@ -15,42 +15,44 @@ export default function Panel() {
         return (
             <div className="p-8 flex flex-col items-center justify-center min-h-screen">
                 <h1 className="text-3xl font-bold text-red-600 mb-4">Acesso Restrito</h1>
-                <p className="text-gray-700">Somente administradores podem publicar canais e cursos.</p>
+                <p className="text-gray-700">Somente administradores podem acessar o painel.</p>
             </div>
         );
     }
 
+    // Avatar do Google
+    const avatarUrl = user?.avatar;
+
     return (
-        <div className="p-8 min-h-screen bg-gray-50">
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded shadow">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Painel de Administração</h1>
+        <div className="flex min-h-screen bg-gray-50">
+            <aside className="w-64 bg-white border-r p-4 flex flex-col">
+                <div className="mb-6">
+                    <h2 className="text-xl font-bold">Administração</h2>
                     {version?.timestamp && (
-                        <span className="text-gray-400 normal-case text-sm" title={version.id}>
-                            Version: {version?.tag && 'v' + version.tag + ' '}{formatDate(version.timestamp)}
+                        <span className="text-xs text-gray-400 block mt-1" title={version.id}>
+                            v{version.tag || 'dev'} - {formatDate(version.timestamp)}
                         </span>
                     )}
                 </div>
-                <p className="mb-8 text-gray-600">Bem-vindo. Aqui você pode gerenciar a publicação de canais e cursos.</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border p-6 rounded-lg hover:shadow-md transition">
-                        <h2 className="text-xl font-semibold mb-4">Canais</h2>
-                        <p className="mb-4 text-gray-600 text-sm">Adicione e gerencie os canais disponíveis no sistema.</p>
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                            Publicar Canal
-                        </button>
+                <nav className="space-y-2 flex-1">
+                    <Link to="/panel" className={`block px-4 py-2 rounded ${location.pathname === '/panel' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Dashboard</Link>
+                    <Link to="/panel/canais" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/canais') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Canais</Link>
+                    <Link to="/panel/cursos" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/cursos') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Cursos</Link>
+                    <Link to="/panel/episodios" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/episodios') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Episódios</Link>
+                </nav>
+                <div className="mt-auto pt-4 border-t flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                        {avatarUrl && <img src={avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="w-10 h-10 rounded-full shadow-sm flex-shrink-0" />}
+                        <span className="text-gray-700 font-medium overflow-hidden text-ellipsis whitespace-nowrap" title={user?.nome}>
+                            Olá, {user?.nome?.split(' ')[0]}
+                        </span>
                     </div>
-
-                    <div className="border p-6 rounded-lg hover:shadow-md transition">
-                        <h2 className="text-xl font-semibold mb-4">Cursos</h2>
-                        <p className="mb-4 text-gray-600 text-sm">Adicione e gerencie os cursos e episódios associados aos canais.</p>
-                        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                            Publicar Curso
-                        </button>
-                    </div>
+                    <Link to="/login/logout" className="text-sm font-medium text-red-600 hover:text-red-800 transition flex-shrink-0" title="Sair">Sair</Link>
                 </div>
-            </div>
+            </aside>
+            <main className="flex-1 p-8 overflow-auto">
+                <Outlet context={{ user }} />
+            </main>
         </div>
     );
 }

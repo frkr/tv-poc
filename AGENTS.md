@@ -26,9 +26,11 @@ E assim marcar como publicado.
 - Todas as rotas do React Router tem um arquivo de inicialização aqui: "site/src/front/routes"
 - O Arquivo de inicialização "site/src/front/routes" deve conter apenas um facade para referenciar funcoes externas. Use o exemplo "panel.ts" e o "panel.tsx" para entender como fazer.
 - Os modulos do backend devem ficar em "site/src/front/.server" use de exemplo o Panel: "site/src/front/.server/panel"
+- Qualquer SQL que for usado no sistema, não deve ficar em formato de string dentro de arquivos TypeScript. Em vez disso, coloque-as centralizadas no arquivo `database.jsonc` que deverá ficar no mesmo diretorio do arquivo TS do backend (site/src/front/.server/*).
 - As rotas de autenticação/login devem seguir o padrão: `login/google` e `login/callback`.
 - Para fazer deploy do site na Cloudflare, execute sempre o comando `pnpm run deploy` dentro do diretório `site`.
 - Ao criar ou modificar testes unitários, os resultados da execução desses testes devem ser incluídos no corpo do pull request. No entanto, arquivos `.log` ou `.txt` (como `pr_comments.txt` ou saídas de log) usados para armazenar temporariamente esses resultados NÃO devem ser "comitados", para não sujar o histórico do git.
+- É obrigatório manter os testes (e2e, unitários) e os documentos (READMEs, relatórios de teste) atualizados sempre que houver novas implementações ou alterações de código.
 
 
 # A Arquitetura do aplicativo para todas as TV's são esses:

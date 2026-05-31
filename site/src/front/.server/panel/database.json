@@ -1,0 +1,32 @@
+{
+    "COUNT_CANAIS": "SELECT COUNT(c.id) as total FROM Canal c INNER JOIN CanalUsuarioAdmin cua ON c.id = cua.id_canal WHERE cua.id_usuario = ?",
+    "COUNT_CURSOS": "SELECT COUNT(c.id) as total FROM Curso c INNER JOIN CursoUsuarioAdmin cua ON c.id = cua.id_curso WHERE cua.id_usuario = ?",
+    "COUNT_EPISODIOS": "SELECT COUNT(e.id) as total FROM Episodio e INNER JOIN Curso c ON e.id_curso = c.id INNER JOIN CursoUsuarioAdmin cua ON c.id = cua.id_curso WHERE cua.id_usuario = ?",
+
+    "SELECT_CANAIS": "SELECT c.* FROM Canal c INNER JOIN CanalUsuarioAdmin cua ON c.id = cua.id_canal WHERE cua.id_usuario = ? ORDER BY c.created_at DESC",
+    "INSERT_CANAL": "INSERT INTO Canal (id, nome, descricao, thumbnail, status, created_at, modified_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    "INSERT_CANAL_USUARIO_ADMIN": "INSERT INTO CanalUsuarioAdmin (id_canal, id_usuario) VALUES (?, ?)",
+    "UPDATE_CANAL": "UPDATE Canal SET nome = ?, descricao = ?, thumbnail = ?, modified_at = ? WHERE id = ? AND id IN (SELECT id_canal FROM CanalUsuarioAdmin WHERE id_usuario = ?)",
+    "DELETE_CANAL": "DELETE FROM Canal WHERE id = ? AND id IN (SELECT id_canal FROM CanalUsuarioAdmin WHERE id_usuario = ?)",
+    "DELETE_CANAL_USUARIO_ADMIN": "DELETE FROM CanalUsuarioAdmin WHERE id_canal = ?",
+
+    "SELECT_CURSOS": "SELECT c.* FROM Curso c INNER JOIN CursoUsuarioAdmin cua ON c.id = cua.id_curso WHERE cua.id_usuario = ? ORDER BY c.created_at DESC",
+    "SELECT_CANAIS_SIMPLES": "SELECT c.id, c.nome FROM Canal c INNER JOIN CanalUsuarioAdmin cua ON c.id = cua.id_canal WHERE cua.id_usuario = ? ORDER BY c.nome ASC",
+    "INSERT_CURSO": "INSERT INTO Curso (id, nome, descricao, thumbnail, status, created_at, modified_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    "INSERT_CURSO_USUARIO_ADMIN": "INSERT INTO CursoUsuarioAdmin (id_curso, id_usuario) VALUES (?, ?)",
+    "UPDATE_CURSO": "UPDATE Curso SET nome = ?, descricao = ?, thumbnail = ?, modified_at = ? WHERE id = ? AND id IN (SELECT id_curso FROM CursoUsuarioAdmin WHERE id_usuario = ?)",
+    "INSERT_CURSO_CANAL": "INSERT INTO CursoCanal (id_curso, id_canal) VALUES (?, ?)",
+    "DELETE_CURSO": "DELETE FROM Curso WHERE id = ? AND id IN (SELECT id_curso FROM CursoUsuarioAdmin WHERE id_usuario = ?)",
+    "DELETE_CURSO_CANAL": "DELETE FROM CursoCanal WHERE id_curso = ?",
+    "DELETE_CURSO_USUARIO_ADMIN": "DELETE FROM CursoUsuarioAdmin WHERE id_curso = ?",
+
+    "SELECT_EPISODIOS": "SELECT e.*, c.nome as curso_nome FROM Episodio e INNER JOIN Curso c ON e.id_curso = c.id INNER JOIN CursoUsuarioAdmin cua ON c.id = cua.id_curso WHERE cua.id_usuario = ? ORDER BY e.created_at DESC",
+    "SELECT_CURSOS_SIMPLES": "SELECT c.id, c.nome FROM Curso c INNER JOIN CursoUsuarioAdmin cua ON c.id = cua.id_curso WHERE cua.id_usuario = ? ORDER BY c.nome ASC",
+    "INSERT_EPISODIO": "INSERT INTO Episodio (id, id_curso, nome, descricao, url, media_type, thumbnail, status, created_at, modified_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "UPDATE_EPISODIO": "UPDATE Episodio SET id_curso = ?, nome = ?, descricao = ?, url = ?, media_type = ?, thumbnail = ?, modified_at = ? WHERE id = ? AND id_curso IN (SELECT id_curso FROM CursoUsuarioAdmin WHERE id_usuario = ?)",
+    "DELETE_EPISODIO": "DELETE FROM Episodio WHERE id = ? AND id_curso IN (SELECT id_curso FROM CursoUsuarioAdmin WHERE id_usuario = ?)",
+
+    "SELECT_USUARIO": "SELECT * FROM Usuario WHERE id = ?",
+    "SELECT_USUARIO_BY_EMAIL": "SELECT id FROM Usuario WHERE email = ?",
+    "INSERT_USUARIO": "INSERT INTO Usuario (id, nome, email, admin, status, lgpd, created_at, modified_at) VALUES (?, ?, ?, 1, 1, 0, ?, ?)"
+}

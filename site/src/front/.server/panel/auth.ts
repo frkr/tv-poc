@@ -1,4 +1,5 @@
 import { createCookieSessionStorage } from "react-router";
+import database from "./database.json";
 
 export const sessionStorage = createCookieSessionStorage({
     cookie: {
@@ -27,17 +28,25 @@ export async function destroySession(session: any) {
 export async function checkAdminAuth(request: Request, env: any) {
     const session = await getSession(request);
     const userId = session.get("userId");
+    const avatar = session.get("avatar");
     
-    if (!userId) return false;
+    if (!userId) return { isAdmin: false, userId: null, user: null };
 
     // Verificar se o usuário existe no banco e é admin
-    const user = await env.DB.prepare("SELECT * FROM Usuario WHERE id = ?").bind(userId).first();
+    const user = await env.DB.prepare(database.SELECT_USUARIO).bind(userId).first();
     
-    if (!user) return false;
+    if (!user) return { isAdmin: false, userId: null, user: null };
+
+    // Adiciona o avatar da sessão ao objeto do usuário
+    user.avatar = avatar;
 
     // Na nossa regra temporária, todo usuário novo é admin (1),
     // mas se o admin for false (0), bloqueamos
-    return user.admin === 1;
+    return { 
+        isAdmin: user.admin === 1,
+        userId: userId,
+        user: user
+    };
 }
 
 export function isJsonRequest(request: Request) {

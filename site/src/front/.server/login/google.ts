@@ -15,7 +15,7 @@ export async function loader({ request, context }: { request: Request, context: 
     googleAuthUrl.searchParams.set("client_id", clientId);
     googleAuthUrl.searchParams.set("redirect_uri", redirectUri);
     googleAuthUrl.searchParams.set("response_type", "code");
-    googleAuthUrl.searchParams.set("scope", "email profile");
+    googleAuthUrl.searchParams.set("scope", "openid email profile");
     googleAuthUrl.searchParams.set("access_type", "online");
     googleAuthUrl.searchParams.set("prompt", "select_account");
 

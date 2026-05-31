@@ -1,5 +1,6 @@
 import { redirect } from "react-router";
 import { getSession, commitSession } from "../panel/auth";
+import database from "../panel/database.json";
 
 export async function loader({ request, context }: { request: Request, context: any }) {
     const env = context?.cloudflare?.env || context?.env;
@@ -35,7 +36,7 @@ export async function loader({ request, context }: { request: Request, context: 
     const tokenData = await tokenResponse.json() as any;
 
     // 2. Get user info
-    const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+    const userInfoResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
 
@@ -47,25 +48,26 @@ export async function loader({ request, context }: { request: Request, context: 
     const userInfo = await userInfoResponse.json() as any;
     const email = userInfo.email;
     const nome = userInfo.name || email;
+    const picture = userInfo.picture;
 
     // 3. Find or Create User in DB
     const db = env.DB;
-    let user = await db.prepare("SELECT id FROM Usuario WHERE email = ?").bind(email).first();
+    let user = await db.prepare(database.SELECT_USUARIO_BY_EMAIL).bind(email).first();
 
     let userId = user?.id;
 
     if (!user) {
         userId = crypto.randomUUID();
         const now = Date.now();
-        await db.prepare(`
-            INSERT INTO Usuario (id, nome, email, admin, status, lgpd, created_at, modified_at)
-            VALUES (?, ?, ?, 1, 1, 0, ?, ?)
-        `).bind(userId, nome, email, now, now).run();
+        await db.prepare(database.INSERT_USUARIO).bind(userId, nome, email, now, now).run();
     }
 
     // 4. Create Session
     const session = await getSession(request);
     session.set("userId", userId);
+    if (picture) {
+        session.set("avatar", picture);
+    }
 
     return redirect("/panel", {
         headers: {

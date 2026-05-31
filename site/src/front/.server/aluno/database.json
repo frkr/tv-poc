@@ -1,0 +1,4 @@
+{
+  "SELECT_ALL_CANAIS": "SELECT * FROM Canal WHERE status = 1 ORDER BY created_at DESC",
+  "SELECT_ALL_CURSOS": "SELECT * FROM Curso WHERE status = 1 ORDER BY created_at DESC"
+}

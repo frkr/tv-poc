@@ -1,32 +1,39 @@
 import { createCookieSessionStorage } from "react-router";
 import database from "./database.json";
 
-export const sessionStorage = createCookieSessionStorage({
-    cookie: {
-        name: "__session",
-        httpOnly: true,
-        path: "/",
-        sameSite: "lax",
-        maxAge: 604_800, // one week
-        secrets: ["secret-fallback"], // O ideal é usar env.GOOGLE_CLIENT_SECRET, mas como o SessionStorage é estático, usamos fallback ou podemos prover dinamicamente
+export function getSessionStorage(env: any) {
+    const secret = env.SESSION_SECRET || env.GOOGLE_CLIENT_SECRET;
+    if (!secret) {
+        throw new Error("Missing session secret in environment variables");
     }
-});
 
-export async function getSession(request: Request) {
+    return createCookieSessionStorage({
+        cookie: {
+            name: "__session",
+            httpOnly: true,
+            path: "/",
+            sameSite: "lax",
+            maxAge: 604_800, // one week
+            secrets: [secret],
+        }
+    });
+}
+
+export async function getSession(request: Request, env: any) {
     const cookie = request.headers.get("Cookie");
-    return sessionStorage.getSession(cookie);
+    return getSessionStorage(env).getSession(cookie);
 }
 
-export async function commitSession(session: any) {
-    return sessionStorage.commitSession(session);
+export async function commitSession(session: any, env: any) {
+    return getSessionStorage(env).commitSession(session);
 }
 
-export async function destroySession(session: any) {
-    return sessionStorage.destroySession(session);
+export async function destroySession(session: any, env: any) {
+    return getSessionStorage(env).destroySession(session);
 }
 
 export async function checkAdminAuth(request: Request, env: any) {
-    const session = await getSession(request);
+    const session = await getSession(request, env);
     const userId = session.get("userId");
     const avatar = session.get("avatar");
     

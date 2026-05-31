@@ -1,0 +1,75 @@
+import { redirect } from "react-router";
+import { getSession, commitSession } from "../panel/auth";
+
+export async function loader({ request, context }: { request: Request, context: any }) {
+    const env = context?.cloudflare?.env || context?.env;
+    const url = new URL(request.url);
+    const code = url.searchParams.get("code");
+
+    if (!code) {
+        return redirect("/?error=NoCode");
+    }
+
+    const clientId = env.GOOGLE_CLIENT_ID;
+    const clientSecret = env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${url.origin}/login/callback`;
+
+    // 1. Exchange code for access token
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            code,
+            grant_type: "authorization_code",
+            redirect_uri: redirectUri,
+        }).toString(),
+    });
+
+    if (!tokenResponse.ok) {
+        console.error("Token error", await tokenResponse.text());
+        return redirect("/?error=TokenError");
+    }
+
+    const tokenData = await tokenResponse.json() as any;
+
+    // 2. Get user info
+    const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+
+    if (!userInfoResponse.ok) {
+        console.error("User info error", await userInfoResponse.text());
+        return redirect("/?error=UserInfoError");
+    }
+
+    const userInfo = await userInfoResponse.json() as any;
+    const email = userInfo.email;
+    const nome = userInfo.name || email;
+
+    // 3. Find or Create User in DB
+    const db = env.DB;
+    let user = await db.prepare("SELECT id FROM Usuario WHERE email = ?").bind(email).first();
+
+    let userId = user?.id;
+
+    if (!user) {
+        userId = crypto.randomUUID();
+        const now = Date.now();
+        await db.prepare(`
+            INSERT INTO Usuario (id, nome, email, admin, status, lgpd, created_at, modified_at)
+            VALUES (?, ?, ?, 1, 1, 0, ?, ?)
+        `).bind(userId, nome, email, now, now).run();
+    }
+
+    // 4. Create Session
+    const session = await getSession(request);
+    session.set("userId", userId);
+
+    return redirect("/panel", {
+        headers: {
+            "Set-Cookie": await commitSession(session),
+        },
+    });
+}

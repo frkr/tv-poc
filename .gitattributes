@@ -1,0 +1,6 @@
+# Garantir que scripts shell usem sempre LF (Line Feed)
+*.sh text eol=lf
+*.tf text eol=lf
+*.tfvars text eol=lf
+*.md text eol=lf
+*.bat text eol=crlf

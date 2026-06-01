@@ -7,8 +7,9 @@
     "start": "vite --host --force",
     "dev": "vite --host --force",
     "build": "vite build --emptyOutDir false",
-    "preview": "vite preview --port 8080 --host",
-    "tsc": "tsc"
+    "preview": "pnpm run build && wrangler dev",
+    "tsc": "tsc",
+    "deploy": "pnpm run build && wrangler deploy"
   },
   "license": "ISC",
   "dependencies": {
@@ -25,7 +26,8 @@
     "terser": "^5.44.0",
     "typescript": "^5.9.3",
     "vite": "^7.1.10",
-    "vite-plugin-solid": "^2.11.9"
+    "vite-plugin-solid": "^2.11.9",
+    "wrangler": "^4.96.0"
   },
   "packageManager": "pnpm@10.17.0"
 }

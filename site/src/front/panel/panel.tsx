@@ -39,6 +39,7 @@ export default function Panel() {
                     <Link to="/panel/canais" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/canais') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Canais</Link>
                     <Link to="/panel/cursos" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/cursos') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Cursos</Link>
                     <Link to="/panel/episodios" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/episodios') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Episódios</Link>
+                    <Link to="/panel/categorias" className={`block px-4 py-2 rounded ${location.pathname.includes('/panel/categorias') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>Categorias</Link>
                 </nav>
                 <div className="mt-auto pt-4 border-t flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 overflow-hidden">

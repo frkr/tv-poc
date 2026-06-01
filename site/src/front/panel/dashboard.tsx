@@ -2,7 +2,7 @@ import { useOutletContext, useLoaderData, Link } from "react-router";
 
 export default function Dashboard() {
     const { user } = useOutletContext<{ user: any }>();
-    const { canaisTotal, cursosTotal, episodiosTotal } = useLoaderData() as { canaisTotal: number, cursosTotal: number, episodiosTotal: number };
+    const { canaisTotal, cursosTotal, episodiosTotal, categoriasTotal } = useLoaderData() as { canaisTotal: number, cursosTotal: number, episodiosTotal: number, categoriasTotal: number };
     const avatarUrl = user?.avatar;
 
     return (
@@ -21,7 +21,7 @@ export default function Dashboard() {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="border p-6 rounded-lg bg-blue-50 text-center">
                     <h2 className="text-xl font-semibold mb-2 text-blue-800">Canais</h2>
                     <p className="text-4xl font-bold text-blue-600">{canaisTotal}</p>
@@ -33,6 +33,10 @@ export default function Dashboard() {
                 <div className="border p-6 rounded-lg bg-purple-50 text-center">
                     <h2 className="text-xl font-semibold mb-2 text-purple-800">Episódios</h2>
                     <p className="text-4xl font-bold text-purple-600">{episodiosTotal}</p>
+                </div>
+                <div className="border p-6 rounded-lg bg-orange-50 text-center">
+                    <h2 className="text-xl font-semibold mb-2 text-orange-800">Categorias</h2>
+                    <p className="text-4xl font-bold text-orange-600">{categoriasTotal}</p>
                 </div>
             </div>
         </div>

@@ -46,6 +46,10 @@ export default function Episodios() {
                         <label className="block text-sm font-medium mb-1">URL do Vídeo</label>
                         <input required type="url" name="url" defaultValue={editingEpisodio?.url} className="w-full p-2 border rounded" placeholder="https://..." />
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Data de Publicação</label>
+                        <input type="date" name="data_publicacao" defaultValue={editingEpisodio?.data_publicacao ? new Date(editingEpisodio.data_publicacao).toISOString().slice(0, 10) : ""} className="w-full p-2 border rounded" />
+                    </div>
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium mb-1">Descrição</label>
                         <textarea required name="descricao" defaultValue={editingEpisodio?.descricao} className="w-full p-2 border rounded" rows={3}></textarea>

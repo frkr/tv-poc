@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS Curso (
 	descricao TEXT NOT NULL,
 	thumbnail TEXT NOT NULL,
 	status INTEGER NOT NULL DEFAULT 1,
+	data_publicacao INTEGER,
 	created_at INTEGER NOT NULL,
 	modified_at INTEGER NOT NULL
 );
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS Episodio (
 	media_type TEXT NOT NULL,
 	thumbnail TEXT NOT NULL,
 	status INTEGER NOT NULL DEFAULT 1,
+	data_publicacao INTEGER,
 	created_at INTEGER NOT NULL,
 	modified_at INTEGER NOT NULL
 );
@@ -71,4 +73,32 @@ CREATE TABLE IF NOT EXISTS EpisodioUsuario (
 	id_episodio TEXT NOT NULL,
 	id_usuario TEXT NOT NULL,
 	PRIMARY KEY (id_episodio, id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS Categoria (
+	id TEXT PRIMARY KEY,
+	categoria TEXT NOT NULL,
+	created_at INTEGER NOT NULL,
+	modified_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS CursoCategoria (
+	id_curso TEXT NOT NULL,
+	id_categoria TEXT NOT NULL,
+	PRIMARY KEY (id_curso, id_categoria)
+);
+
+CREATE TABLE IF NOT EXISTS EpisodioProgresso (
+	id_episodio TEXT NOT NULL,
+	id_usuario TEXT NOT NULL,
+	progresso INTEGER NOT NULL DEFAULT 0,
+	concluido INTEGER NOT NULL DEFAULT 0,
+	updated_at INTEGER NOT NULL,
+	PRIMARY KEY (id_episodio, id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS UsuarioToken (
+	id_usuario TEXT NOT NULL PRIMARY KEY,
+	token TEXT NOT NULL UNIQUE,
+	created_at INTEGER NOT NULL
 );

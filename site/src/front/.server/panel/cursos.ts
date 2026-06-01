@@ -9,7 +9,8 @@ export async function loader({ request, context }: { request: Request, context: 
     
     const { results: cursos } = await env.DB.prepare(database.SELECT_CURSOS).bind(userId).all();
     const { results: canais } = await env.DB.prepare(database.SELECT_CANAIS_SIMPLES).bind(userId).all();
-    return { cursos, canais };
+    const { results: categorias } = await env.DB.prepare(database.SELECT_CATEGORIAS_SIMPLES).all();
+    return { cursos, canais, categorias };
 }
 
 export async function action({ request, context }: { request: Request, context: any }) {
@@ -27,19 +28,32 @@ export async function action({ request, context }: { request: Request, context: 
         const thumbnail = formData.get("thumbnail")?.toString() || "";
         const id_canal = formData.get("id_canal")?.toString() || "";
         
+        const data_publicacao_str = formData.get("data_publicacao")?.toString();
+        const parsedDate = data_publicacao_str ? new Date(data_publicacao_str).getTime() : null;
+        const data_publicacao = (parsedDate && !isNaN(parsedDate)) ? parsedDate : null;
+        const id_categoria = formData.get("id_categoria")?.toString() || "";
+
+        if (!id_categoria) {
+            return { error: "Categoria é obrigatória" };
+        }
+
+        if (id_canal) {
+            const canalOwner = await env.DB.prepare(
+                "SELECT 1 FROM CanalUsuarioAdmin WHERE id_canal = ? AND id_usuario = ?"
+            ).bind(id_canal, userId).first();
+            if (!canalOwner) return { error: "Não autorizado para este canal" };
+        }
+
         const id = await randomHEX();
-        
+
         const stmt1 = env.DB.prepare(database.INSERT_CURSO)
-            .bind(id, nome, descricao, thumbnail, 1, now, now);
+            .bind(id, nome, descricao, thumbnail, 1, data_publicacao, now, now);
         const stmtInsertAdmin = env.DB.prepare(database.INSERT_CURSO_USUARIO_ADMIN).bind(id, userId);
         
-        if (id_canal) {
-            const stmt2 = env.DB.prepare(database.INSERT_CURSO_CANAL)
-                .bind(id, id_canal);
-            await env.DB.batch([stmt1, stmtInsertAdmin, stmt2]);
-        } else {
-            await env.DB.batch([stmt1, stmtInsertAdmin]);
-        }
+        const stmts = [stmt1, stmtInsertAdmin];
+        if (id_canal) stmts.push(env.DB.prepare(database.INSERT_CURSO_CANAL).bind(id, id_canal));
+        if (id_categoria) stmts.push(env.DB.prepare(database.INSERT_CURSO_CATEGORIA).bind(id, id_categoria));
+        await env.DB.batch(stmts);
         
         return { success: true };
     }
@@ -50,21 +64,37 @@ export async function action({ request, context }: { request: Request, context: 
         const descricao = formData.get("descricao")?.toString() || "";
         const thumbnail = formData.get("thumbnail")?.toString() || "";
         const id_canal = formData.get("id_canal")?.toString() || "";
-        
+        const id_categoria = formData.get("id_categoria")?.toString() || "";
+        const data_publicacao_str_u = formData.get("data_publicacao")?.toString();
+        const parsedDateU = data_publicacao_str_u ? new Date(data_publicacao_str_u).getTime() : null;
+        const data_publicacao_u = (parsedDateU && !isNaN(parsedDateU)) ? parsedDateU : null;
+
+        if (!id_categoria) {
+            return { error: "Categoria é obrigatória" };
+        }
+
         if (id) {
-            const stmt1 = env.DB.prepare(database.UPDATE_CURSO)
-                .bind(nome, descricao, thumbnail, now, id, userId);
-            
-            // Updates to relationships might be complex, typically we delete and re-insert 
-            // for many-to-many, but here it's 1-to-N or simpler.
-            const stmtDeleteAssoc = env.DB.prepare(database.DELETE_CURSO_CANAL).bind(id);
-            
+            const isOwner = await env.DB.prepare(
+                "SELECT 1 FROM CursoUsuarioAdmin WHERE id_curso = ? AND id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isOwner) return { error: "Não autorizado" };
+
             if (id_canal) {
-                const stmtInsertAssoc = env.DB.prepare(database.INSERT_CURSO_CANAL).bind(id, id_canal);
-                await env.DB.batch([stmtDeleteAssoc, stmtInsertAssoc, stmt1]);
-            } else {
-                await env.DB.batch([stmtDeleteAssoc, stmt1]);
+                const canalOwner = await env.DB.prepare(
+                    "SELECT 1 FROM CanalUsuarioAdmin WHERE id_canal = ? AND id_usuario = ?"
+                ).bind(id_canal, userId).first();
+                if (!canalOwner) return { error: "Não autorizado para este canal" };
             }
+
+            const stmt1 = env.DB.prepare(database.UPDATE_CURSO)
+                .bind(nome, descricao, thumbnail, data_publicacao_u, now, id, userId);
+            const stmtDeleteCanal = env.DB.prepare(database.DELETE_CURSO_CANAL).bind(id);
+            const stmtDeleteCategoria = env.DB.prepare(database.DELETE_CURSO_CATEGORIA).bind(id);
+
+            const stmts = [stmtDeleteCanal, stmtDeleteCategoria, stmt1];
+            if (id_canal) stmts.push(env.DB.prepare(database.INSERT_CURSO_CANAL).bind(id, id_canal));
+            if (id_categoria) stmts.push(env.DB.prepare(database.INSERT_CURSO_CATEGORIA).bind(id, id_categoria));
+            await env.DB.batch(stmts);
         }
         
         return { success: true };
@@ -73,10 +103,17 @@ export async function action({ request, context }: { request: Request, context: 
     if (intent === "delete") {
         const id = formData.get("id")?.toString();
         if (id) {
-            const stmt1 = env.DB.prepare(database.DELETE_CURSO_USUARIO_ADMIN).bind(id);
-            const stmt2 = env.DB.prepare(database.DELETE_CURSO_CANAL).bind(id);
-            const stmt3 = env.DB.prepare(database.DELETE_CURSO).bind(id, userId);
-            await env.DB.batch([stmt1, stmt2, stmt3]);
+            const isOwner = await env.DB.prepare(
+                "SELECT 1 FROM CursoUsuarioAdmin WHERE id_curso = ? AND id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isOwner) return { error: "Não autorizado" };
+
+            const stmt1 = env.DB.prepare(database.DELETE_CURSO).bind(id, userId);
+            const stmt2 = env.DB.prepare(database.DELETE_CURSO_USUARIO_ADMIN).bind(id);
+            const stmt3 = env.DB.prepare(database.DELETE_CURSO_CANAL).bind(id);
+            const stmt4 = env.DB.prepare(database.DELETE_CURSO_CATEGORIA).bind(id);
+            const stmt5 = env.DB.prepare(database.DELETE_EPISODIOS_BY_CURSO).bind(id);
+            await env.DB.batch([stmt1, stmt2, stmt3, stmt4, stmt5]);
         }
         return { success: true };
     }

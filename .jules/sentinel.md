@@ -1,1 +1,0 @@
-- Mitigated OAuth CSRF vulnerability in React Router + Cloudflare Workers by introducing state validation. State is stored in a secure HttpOnly cookie session via getSession/commitSession and validated strictly on callback.

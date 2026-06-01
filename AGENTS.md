@@ -8,6 +8,10 @@ Tanto o Site quanto o Aplicativo de TV, vai mostrar quais Canais disponíveis el
 Cada Publicadora vai informar os links de seus recursos. O backend vai validar se os links são imagens e videos nos tamanhos corretos.
 E assim marcar como publicado.
 
+Estado atual:
+- O **backend** (Cloudflare Workers + React Router, em `site`) está implementado e publicado em `curso.ideias.casa`, incluindo a API da TV em `api/v1/tv/*` (home, cursos, categorias, canais, episódios, progresso), autenticação por token `XXX-YYY` (página `/tv`), as tabelas `Categoria`/`CursoCategoria`, o campo `data_publicacao` em `Curso`/`Episodio` e o CRUD global de categorias no painel administrativo.
+- O **aplicativo de TV** (framework SolidTV, em `tv`) está implementado: login por código, menu lateral com 3 itens (Cursos com "Continue assistindo" + recentes, Categorias e Canais), detalhe do curso e player de vídeo (shaka-player) com retomada e gravação de progresso. Rodar com `cd tv && pnpm install && pnpm start`. Ver [tv/README.md](tv/README.md).
+
 > Lembre-se, que este resumo `acima` deve-se ser atualizado !sempre!.
 
 ## Diretrizes para o desenvolvimento:
@@ -36,6 +40,7 @@ E assim marcar como publicado.
 # A Arquitetura do aplicativo para todas as TV's são esses:
 - https://solid-tv.github.io/solid/#/essentials/ai_context
 - [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)
+- [Demo TV App](https://github.com/solid-tv/solid-demo-app)
 
 # O backend será feito para cloudflare
 - https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/

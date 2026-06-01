@@ -63,7 +63,7 @@ export async function loader({ request, context }: { request: Request, context: 
     }
 
     // 4. Create Session
-    const session = await getSession(request);
+    const session = await getSession(request, env);
     session.set("userId", userId);
     if (picture) {
         session.set("avatar", picture);
@@ -71,7 +71,7 @@ export async function loader({ request, context }: { request: Request, context: 
 
     return redirect("/panel", {
         headers: {
-            "Set-Cookie": await commitSession(session),
+            "Set-Cookie": await commitSession(session, env),
         },
     });
 }

@@ -32,15 +32,18 @@ export async function action({ request, context }: { request: Request, context: 
         
         if (!id_curso) return { error: "Selecione um curso" };
 
-        // Need to check if the user is authorized to add an episode to this course!
-        // But since the form dropdown only shows their courses, they'd have to forge it.
-        // The safest way is to do the INSERT and rely on application logic or just insert it.
-        // Actually, without a foreign key or CHECK constraint in SQLite, it might succeed,
-        // but they can't see it since SELECT_EPISODIOS filters by their courses.
+        const isCursoOwner = await env.DB.prepare(
+            "SELECT 1 FROM CursoUsuarioAdmin WHERE id_curso = ? AND id_usuario = ?"
+        ).bind(id_curso, userId).first();
+        if (!isCursoOwner) return { error: "Não autorizado para este curso" };
+
+        const data_publicacao_str = formData.get("data_publicacao")?.toString();
+        const parsedDate = data_publicacao_str ? new Date(data_publicacao_str).getTime() : null;
+        const data_publicacao = (parsedDate && !isNaN(parsedDate)) ? parsedDate : null;
 
         const id = await randomHEX();
         await env.DB.prepare(database.INSERT_EPISODIO)
-            .bind(id, id_curso, nome, descricao, url, media_type, thumbnail, 1, now, now).run();
+            .bind(id, id_curso, nome, descricao, url, media_type, thumbnail, 1, data_publicacao, now, now).run();
         
         return { success: true };
     }
@@ -54,9 +57,24 @@ export async function action({ request, context }: { request: Request, context: 
         const media_type = formData.get("media_type")?.toString() || "video/mp4";
         const thumbnail = formData.get("thumbnail")?.toString() || "";
         
+        const data_publicacao_str = formData.get("data_publicacao")?.toString();
+
         if (id && id_curso) {
+            const isCursoOwner = await env.DB.prepare(
+                "SELECT 1 FROM CursoUsuarioAdmin WHERE id_curso = ? AND id_usuario = ?"
+            ).bind(id_curso, userId).first();
+            if (!isCursoOwner) return { error: "Não autorizado para este curso" };
+
+            const isEpisodioOwner = await env.DB.prepare(
+                "SELECT 1 FROM Episodio e INNER JOIN CursoUsuarioAdmin cua ON e.id_curso = cua.id_curso WHERE e.id = ? AND cua.id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isEpisodioOwner) return { error: "Não autorizado para este episódio" };
+
+            const parsedDateU = data_publicacao_str ? new Date(data_publicacao_str).getTime() : null;
+            const data_publicacao = (parsedDateU && !isNaN(parsedDateU)) ? parsedDateU : null;
+
             await env.DB.prepare(database.UPDATE_EPISODIO)
-                .bind(id_curso, nome, descricao, url, media_type, thumbnail, now, id, userId).run();
+                .bind(id_curso, nome, descricao, url, media_type, thumbnail, data_publicacao, now, id, userId).run();
         }
         
         return { success: true };
@@ -65,6 +83,11 @@ export async function action({ request, context }: { request: Request, context: 
     if (intent === "delete") {
         const id = formData.get("id")?.toString();
         if (id) {
+            const isEpisodioOwner = await env.DB.prepare(
+                "SELECT 1 FROM Episodio e INNER JOIN CursoUsuarioAdmin cua ON e.id_curso = cua.id_curso WHERE e.id = ? AND cua.id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isEpisodioOwner) return { error: "Não autorizado para este episódio" };
+
             await env.DB.prepare(database.DELETE_EPISODIO).bind(id, userId).run();
         }
         return { success: true };

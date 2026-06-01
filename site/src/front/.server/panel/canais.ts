@@ -43,6 +43,11 @@ export async function action({ request, context }: { request: Request, context: 
         const thumbnail = formData.get("thumbnail")?.toString() || "";
         
         if (id) {
+            const isOwner = await env.DB.prepare(
+                "SELECT 1 FROM CanalUsuarioAdmin WHERE id_canal = ? AND id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isOwner) return { error: "Não autorizado" };
+
             await env.DB.prepare(database.UPDATE_CANAL)
                 .bind(nome, descricao, thumbnail, now, id, userId).run();
         }
@@ -53,12 +58,15 @@ export async function action({ request, context }: { request: Request, context: 
     if (intent === "delete") {
         const id = formData.get("id")?.toString();
         if (id) {
-            const stmt1 = env.DB.prepare(database.DELETE_CANAL_USUARIO_ADMIN).bind(id);
-            const stmt2 = env.DB.prepare(database.DELETE_CANAL).bind(id, userId);
-            // It might fail if the user tries to delete a channel they don't own, 
-            // but the WHERE clause in DELETE_CANAL prevents it from being deleted if they don't own it.
-            // But we should delete from CanalUsuarioAdmin first to avoid foreign key issues or leaving orphaned rows.
-            await env.DB.batch([stmt1, stmt2]);
+            const isOwner = await env.DB.prepare(
+                "SELECT 1 FROM CanalUsuarioAdmin WHERE id_canal = ? AND id_usuario = ?"
+            ).bind(id, userId).first();
+            if (!isOwner) return { error: "Não autorizado" };
+
+            const stmt1 = env.DB.prepare(database.DELETE_CANAL).bind(id, userId);
+            const stmt2 = env.DB.prepare(database.DELETE_CURSO_CANAL_BY_CANAL).bind(id);
+            const stmt3 = env.DB.prepare(database.DELETE_CANAL_USUARIO_ADMIN).bind(id);
+            await env.DB.batch([stmt1, stmt2, stmt3]);
         }
         return { success: true };
     }

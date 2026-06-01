@@ -36,6 +36,9 @@ export interface Curso {
 	descricao: string;
 	thumbnail: string;
 	status: boolean;
+	data_publicacao?: number | null;
+	id_canal?: string | null;
+	id_categoria: string;
 	created_at: number;
 	modified_at: number;
 }
@@ -59,6 +62,7 @@ export interface Episodio {
 	media_type: string;
 	thumbnail: string;
 	status: boolean;
+	data_publicacao?: number | null;
 	created_at: number;
 	modified_at: number;
 }
@@ -66,4 +70,30 @@ export interface Episodio {
 export interface EpisodioUsuario {
 	id_episodio: string;
 	id_usuario: string;
+}
+
+export interface Categoria {
+	id: string;
+	categoria: string;
+	created_at: number;
+	modified_at: number;
+}
+
+export interface CursoCategoria {
+	id_curso: string;
+	id_categoria: string;
+}
+
+export interface EpisodioProgresso {
+	id_episodio: string;
+	id_usuario: string;
+	progresso: number;
+	concluido: number;
+	updated_at: number;
+}
+
+export interface UsuarioToken {
+	id_usuario: string;
+	token: string;
+	created_at: number;
 }

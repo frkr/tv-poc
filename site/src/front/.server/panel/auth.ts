@@ -19,15 +19,18 @@ export function getSessionStorage(env: any) {
     });
 }
 
+// Helper to retrieve session, injecting `env` for Cloudflare Worker bindings
 export async function getSession(request: Request, env: any) {
     const cookie = request.headers.get("Cookie");
     return getSessionStorage(env).getSession(cookie);
 }
 
+// Helper to commit session, injecting `env` for Cloudflare Worker bindings
 export async function commitSession(session: any, env: any) {
     return getSessionStorage(env).commitSession(session);
 }
 
+// Helper to destroy session, injecting `env` for Cloudflare Worker bindings
 export async function destroySession(session: any, env: any) {
     return getSessionStorage(env).destroySession(session);
 }

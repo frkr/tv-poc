@@ -15,7 +15,7 @@ export function getSessionStorage(env: any) {
             sameSite: "lax",
             maxAge: 604_800, // one week
             secrets: [secret],
-            secure: true,
+            secure: import.meta.env ? import.meta.env.PROD : true,
         }
     });
 }

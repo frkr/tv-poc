@@ -75,7 +75,7 @@ describe("auth functions", () => {
 	});
 
 	describe("checkAdminAuth", () => {
-		const mockEnv = { ...env, SESSION_SECRET: "test-secret" };
+		const mockEnv = { DB: env.DB, SESSION_SECRET: "test-secret" };
 
 		it("should return false if userId is not in session", async () => {
 			const request = new Request("http://localhost");

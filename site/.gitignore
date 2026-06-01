@@ -4,3 +4,4 @@ build/
 .wrangler/
 tsconfig.cloudflare.tsbuildinfo
 tsconfig.node.tsbuildinfo
+dist/

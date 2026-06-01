@@ -17,3 +17,6 @@ pdf_output/
 .claude-sessions/
 .junie
 .envrc
+
+dist/
+tsconfig.node.tsbuildinfo

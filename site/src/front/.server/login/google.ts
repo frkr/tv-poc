@@ -1,4 +1,5 @@
 import { redirect } from "react-router";
+import { getSession, commitSession } from "../panel/auth";
 
 export async function loader({ request, context }: { request: Request, context: any }) {
     const env = context?.cloudflare?.env || context?.env;
@@ -19,5 +20,15 @@ export async function loader({ request, context }: { request: Request, context: 
     googleAuthUrl.searchParams.set("access_type", "online");
     googleAuthUrl.searchParams.set("prompt", "select_account");
 
-    return redirect(googleAuthUrl.toString());
+    const state = crypto.randomUUID();
+    googleAuthUrl.searchParams.set("state", state);
+
+    const session = await getSession(request, env);
+    session.set("oauth_state", state);
+
+    return redirect(googleAuthUrl.toString(), {
+        headers: {
+            "Set-Cookie": await commitSession(session, env),
+        },
+    });
 }

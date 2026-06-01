@@ -6,10 +6,20 @@ export async function loader({ request, context }: { request: Request, context: 
     const env = context?.cloudflare?.env || context?.env;
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
+    const state = url.searchParams.get("state");
 
     if (!code) {
         return redirect("/?error=NoCode");
     }
+
+    const session = await getSession(request, env);
+    const oauthState = session.get("oauth_state");
+
+    if (!state || !oauthState || state !== oauthState) {
+        return redirect("/?error=InvalidState");
+    }
+
+    session.unset("oauth_state");
 
     const clientId = env.GOOGLE_CLIENT_ID;
     const clientSecret = env.GOOGLE_CLIENT_SECRET;
@@ -63,7 +73,6 @@ export async function loader({ request, context }: { request: Request, context: 
     }
 
     // 4. Create Session
-    const session = await getSession(request, env);
     session.set("userId", userId);
     if (picture) {
         session.set("avatar", picture);

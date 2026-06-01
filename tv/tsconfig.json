@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2019",
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidtv/solid",
+    "types": ["vite/client"],
+    "noEmit": true,
+    "isolatedModules": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "customConditions": ["@solidtv/source"],
+    "paths": {
+      "theme": ["./src/theme.ts"]
+    }
+  }
+}

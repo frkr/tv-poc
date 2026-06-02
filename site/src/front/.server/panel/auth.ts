@@ -11,6 +11,7 @@ export function getSessionStorage(env: any) {
         cookie: {
             name: "__session",
             httpOnly: true,
+            secure: import.meta.env.PROD,
             path: "/",
             sameSite: "lax",
             maxAge: 604_800, // one week

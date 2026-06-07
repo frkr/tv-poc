@@ -1,5 +1,26 @@
 import { describe, it, expect } from "vitest";
-import { isJsonRequest } from "../../../src/front/.server/panel/auth";
+import { isJsonRequest, getSessionStorage } from "../../../src/front/.server/panel/auth";
+
+describe("getSessionStorage", () => {
+	it("should create session storage when SESSION_SECRET is provided", () => {
+		const env = { SESSION_SECRET: "my-super-secret" };
+		const storage = getSessionStorage(env);
+		expect(storage).toBeDefined();
+		expect(storage.getSession).toBeDefined();
+		expect(storage.commitSession).toBeDefined();
+		expect(storage.destroySession).toBeDefined();
+	});
+
+	it("should throw an error when SESSION_SECRET is missing", () => {
+		const env = {};
+		expect(() => getSessionStorage(env)).toThrow("Missing session secret in environment variables");
+	});
+
+	it("should throw an error when SESSION_SECRET is missing even if GOOGLE_CLIENT_SECRET is present", () => {
+		const env = { GOOGLE_CLIENT_SECRET: "google-secret" };
+		expect(() => getSessionStorage(env)).toThrow("Missing session secret in environment variables");
+	});
+});
 
 describe("isJsonRequest", () => {
 	it("should return true when Accept header is application/json", () => {

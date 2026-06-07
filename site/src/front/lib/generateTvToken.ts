@@ -2,11 +2,6 @@ export default function generateTvToken(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const array = new Uint8Array(6);
     crypto.getRandomValues(array);
-    let part1 = "";
-    let part2 = "";
-    for (let i = 0; i < 3; i++) {
-        part1 += chars[array[i] % chars.length];
-        part2 += chars[array[i + 3] % chars.length];
-    }
-    return `${part1}-${part2}`;
+    const l = chars.length;
+    return `${chars[array[0] % l]}${chars[array[1] % l]}${chars[array[2] % l]}-${chars[array[3] % l]}${chars[array[4] % l]}${chars[array[5] % l]}`;
 }

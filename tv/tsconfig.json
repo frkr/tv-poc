@@ -13,9 +13,10 @@
     "isolatedModules": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "customConditions": ["@solidtv/source"],
+    "customConditions": [],
     "paths": {
       "theme": ["./src/theme.ts"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

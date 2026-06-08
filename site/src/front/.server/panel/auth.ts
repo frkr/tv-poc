@@ -2,7 +2,7 @@ import { createCookieSessionStorage } from "react-router";
 import database from "./database.json";
 
 export function getSessionStorage(env: any) {
-    const secret = env.SESSION_SECRET || env.GOOGLE_CLIENT_SECRET;
+    const secret = env.SESSION_SECRET;
     if (!secret) {
         throw new Error("Missing session secret in environment variables");
     }

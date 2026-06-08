@@ -1,1 +1,0 @@
-This folder contains the built output assets for the worker "curso" generated at 2026-06-07T15:00:19.591Z.

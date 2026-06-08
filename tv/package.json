@@ -23,10 +23,12 @@
   "devDependencies": {
     "@lightningtv/vite-hex-transform": "^1.1.0",
     "@vitejs/plugin-legacy": "^7.2.1",
+    "jsdom": "^29.1.1",
     "terser": "^5.44.0",
     "typescript": "^5.9.3",
     "vite": "^7.1.10",
     "vite-plugin-solid": "^2.11.9",
+    "vitest": "^4.1.8",
     "wrangler": "^4.96.0"
   },
   "packageManager": "pnpm@10.17.0"

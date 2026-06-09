@@ -25,7 +25,17 @@ export async function loader({ request, context }: { request: Request, context: 
     });
 }
 
+function escapeHtml(unsafe: string) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 function renderTokenPage(nome: string, token: string) {
+    const safeNome = escapeHtml(nome.split(' ')[0] || '');
     return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -44,7 +54,7 @@ function renderTokenPage(nome: string, token: string) {
 </head>
 <body>
   <div class="card">
-    <h1>Olá, ${nome.split(' ')[0]}!</h1>
+    <h1>Olá, ${safeNome}!</h1>
     <p>Seu token de acesso ao aplicativo de TV:</p>
     <div class="token">${token}</div>
     <button onclick="refreshToken()">Gerar novo token</button>

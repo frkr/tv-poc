@@ -36,6 +36,11 @@ export default async function handleRequest(
   }
 
   responseHeaders.set("Content-Type", "text/html");
+  responseHeaders.set("X-Content-Type-Options", "nosniff");
+  responseHeaders.set("X-Frame-Options", "DENY");
+  responseHeaders.set("X-XSS-Protection", "1; mode=block");
+  responseHeaders.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  responseHeaders.set("Content-Security-Policy", "default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self' https:");
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,

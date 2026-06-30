@@ -21,7 +21,14 @@ export async function loader({ request, context }: { request: Request, context: 
     await env.DB.prepare(tvDatabase.UPSERT_TOKEN).bind(userId, token, Date.now()).run();
 
     return new Response(renderTokenPage(user.nome, token), {
-        headers: { "Content-Type": "text/html; charset=utf-8" },
+        headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+        },
     });
 }
 

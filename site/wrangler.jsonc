@@ -45,8 +45,8 @@
 	"vars": {
 //		"MAX_AGE_DAYS": "30",
 		"GOOGLE_CLIENT_ID": "1031177018011-fl4rg0bahr3m6j9rc06mq645phiana86.apps.googleusercontent.com",
-		"GOOGLE_CLIENT_SECRET": "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",
-		"SESSION_SECRET": "local-development-session-secret"
+		"GOOGLE_CLIENT_SECRET": "",
+		"SESSION_SECRET": ""
 	},
 	/**
 	 * Static Assets

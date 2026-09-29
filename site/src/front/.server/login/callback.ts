@@ -57,6 +57,12 @@ export async function loader({ request, context }: { request: Request, context: 
 
     const userInfo = await userInfoResponse.json() as any;
     const email = userInfo.email;
+
+    // Prevent account takeover via unverified email
+    if (!email || userInfo.email_verified === false) {
+        return redirect("/?error=UnverifiedEmail");
+    }
+
     const nome = userInfo.name || email;
     const picture = userInfo.picture;
 
